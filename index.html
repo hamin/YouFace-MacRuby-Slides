@@ -1,0 +1,506 @@
+<!doctype html>  
+<html lang="en">
+	
+	<head>
+		<meta charset="utf-8">
+		
+		<title>Your Face with Macruby...in 10 minutes!</title>
+
+		<meta name="description" content="An easy to use CSS 3D slideshow tool for quickly creating good looking HTML presentations.">
+		<meta name="author" content="Haris Amin">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		
+		<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+		
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="css/print.css" type="text/css" media="print">
+
+		<link rel="stylesheet" href="lib/zenburn.css">
+	</head>
+	
+	<body>
+		
+		<div class="reveal">
+
+			<!-- Used to fade in a background when a specific slide state is reached -->
+			<div class="state-background"></div>
+			
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Your Face</h1>
+					<h2>with</h2>
+					<img src="assets/macruby_logo.png"></img>
+					<h2>...in 10 minutes</h2>
+					
+					<h3 class="inverted">by Haris Amin</h3>
+					<script>
+						// Delicously hacky. Look away.
+						if( navigator.userAgent.match( /(iPhone|iPad|iPod|Android)/i ) ) document.write( '<p style="color: rgba(0,0,0,0.3); text-shadow: none;">('+'Tap to navigate'+')</p>' );
+					</script>
+				</section>
+				
+        <section>
+          <h2>This is where I work</h2>
+          <img src="http://dietsthatwork.net/wp-content/uploads/2011/02/DailyBurn.jpg">
+				</section>
+				
+				
+				<section>
+          <h2>But I also like to hack :)</h2>
+          <img src="assets/cyborg_vision.png">
+				</section>
+				
+				<section>
+					<h2>MacRuby</h2>
+					<blockquote cite="http://macruby.org">
+						MacRuby is an implementation of Ruby 1.9 directly on top of Mac OS X core technologies such as the Objective-C runtime and garbage collector, the LLVM compiler infrastructure and the Foundation and ICU frameworks. It is the goal of MacRuby to enable the creation of full-fledged Mac OS X applications which do not sacrifice performance in order to enjoy the benefits of using Ruby.
+					</blockquote>
+					<p>
+            <i><small>- <a href="http://merbist.com/2010/11/12/rubyconf-2010-macruby-talk/">MacRuby</a> / <a href="http://twitter.com/merbist">@macruby</a></small></i>
+          </p>
+				</section>
+        
+        <section>
+					<h2>Get the Funk!</h2>
+					<p>
+						Download the latest Macruby and create a new Project in Xcode!
+					</p>
+					<img src="http://cdn-ak.f.st-hatena.com/images/fotolife/W/Watson/20110509/20110509165458.png">
+				</section>
+				
+				<section>
+					<h2>Blueprint</h2>
+					<p>
+						This is how the UI is going to look like in Interface Builder.
+					</p>
+					<img src="assets/ib_ui.png">
+				</section>
+				
+				<section>
+					<h2>Let's Get up and Setup!</h2>
+					<ul>
+						<li><strong>rb_main.rb</strong> initializes our app</li>
+						<li>Almost never needs to be modified...</li>
+						<li>...except this time</li>
+					</ul>
+					<pre><code class="ruby" style="font-size: 30px; margin-top: 20px;" contenteditable>
+framework 'avfoundation'
+          </code></pre>
+					
+				</section>
+				
+				<!-- Example of nested vertical slides -->
+				<section>
+					<section>
+						<h2>Initialize Your FACE!</h2>
+						<p>
+						  We need to initialize our camera to capture video and display a preview of the captured video.
+						</p>
+						<a href="#/2/1" class="image">
+							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png">
+						</a>
+					</section>
+					<section>
+						<h2>Prepare Session & Ready Device</h2>
+						<p>Press down or up to navigate.</p>
+						<pre style="width:800px;">
+						  <code class="ruby" style="font-size:20px; margin-top: 20px;" contenteditable>
+def applicationDidFinishLaunching(a_notification)
+#...	
+					    
+session = AVCaptureSession.new
+
+
+device = AVCaptureDevice.defaultDeviceWithMediaType AVMediaTypeVideo
+
+
+session.sessionPreset = AVCaptureSessionPreset640x480
+
+
+width = 640
+
+height = 480
+
+#...
+end
+                </code>
+              </pre>
+					</section>
+					
+					<section>
+						<h2>Set up input & output</h2>
+						<p>We are setting the camera's input and output AV Foundation objects</p>
+						<pre style="width:800px;">
+						  <code class="ruby" style="font-size:20px; margin-top: 20px;" contenteditable>
+def applicationDidFinishLaunching(a_notification)
+#...
+						    
+input = AVCaptureDeviceInput.deviceInputWithDevice device, error:nil
+
+output = AVCaptureVideoDataOutput.new
+
+output.alwaysDiscardsLateVideoFrames = true
+
+session.addInput input
+session.addOutput output
+
+#...
+end
+                </code>
+              </pre>
+
+					</section>
+					
+					<section>
+					<h2>Setup our Camera Preview</h2>
+					<p>We're adding the video preview as a sublayer</p>
+					<pre style="width:800px;">
+					  <code class="ruby" style="font-size:20px; margin-top: 20px;" contenteditable>
+def applicationDidFinishLaunching(a_notification)
+#...
+
+@preview_layer = AVCaptureVideoPreviewLayer.layerWithSession session
+
+@preview_layer.frame = [0.0, 0.0, width, height]
+
+@preview_layer.affineTransform = CGAffineTransformMakeScale -1,1
+
+@camera_preview.wantsLayer = true
+
+@camera_preview.layer.addSublayer @preview_layer
+
+#...
+end
+              </code>
+            </pre>
+					</section>
+					
+				<section>
+					<h2>Start the Session</h2>
+					<pre>
+					  <code class="ruby" style="font-size:20px; margin-top: 20px;" contenteditable>
+def applicationDidFinishLaunching(a_notification)
+#...
+
+session.startRunning
+
+#...
+end
+              </code>
+            </pre>
+					</section>
+				</section>
+
+<!-- END OF INITIALIZE  -->
+
+				<section>
+					<h2>Grand Central Dispatch</h2>
+					<blockquote cite="http://searchservervirtualization.techtarget.com/definition/Our-Favorite-Technology-Quotations">
+						GCD is an abstraction layer allowing developers to only focus on business logic without having to worry about the underlying details if you don’t want to. The end result is an optimum use of all the cores available on a machine and truly concurrent code.
+					</blockquote>
+					<p>
+            <i><small>- <a href="http://merbist.com/2010/11/12/rubyconf-2010-macruby-talk/">Matt Aimonetti</a> / <a href="http://twitter.com/merbist">@merbist</a></small></i>
+          </p>
+				</section>
+
+				<section>
+					<h2>Video Sampling</h2>
+					<p>
+						We're going to sample our video output buffers using GCD
+					</p>
+
+                  
+					<pre>
+					  <code class="ruby" style="font-size:20px; margin-top: 20px;" contenteditable>
+def applicationDidFinishLaunching(a_notification)
+#...
+
+queue = Dispatch::Queue.new('cameraQueue')
+
+output.setSampleBufferDelegate self, queue:queue.dispatch_object
+
+#...
+end
+              </code>
+            </pre>        
+				</section>
+				
+				<!-- Example of nested vertical slides -->
+				<section>
+					<section>
+						<h2>Detect Your Face!</h2>
+						<p>
+						  We will use CoreImage's built-in Face Detection capabilites
+						</p>
+						<a href="#/2/1" class="image">
+							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png">
+						</a>
+					</section>
+					<section>
+						<h2>Face Detection Features</h2>
+						<ul>
+						  <li>Core Image gives us a face detection feature</li>
+						  <li>Each Feature object has NSPoint objects for 3 facial features</li>
+						  <li>Currently only supports left eye, right eye, and mouth</li>
+						</ul>  
+					</section>
+
+					<section>
+						<h2>Initialize detector</h2>
+						<p>We create a Core Image detector when the app launches</p>
+						<pre style="width:900px;">
+						  <code class="ruby" style="font-size:20px; margin-top: 20px;" contenteditable>
+def applicationDidFinishLaunching(a_notification)
+#...
+
+@detector = CIDetector.detectorOfType "CIDetectorTypeFace", context:nil, options: {CIDetectorAccuracy: CIDetectorAccuracyLow}
+
+#...
+end
+                </code>
+              </pre>
+
+					</section>
+
+					<section>
+					<h2>Implement Delegate</h2>
+					<p>We initialize the captureOutput delegate for where we will detect the features from the current frame</p>
+					<pre style="width:800px;">
+					  <code class="ruby" style="font-size:20px; margin-top: 20px;" contenteditable>
+def captureOutput(captureOutput, didOutputSampleBuffer:sampleBuffer, fromConnection:connection)
+#...
+
+imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)
+image = CIImage.imageWithCVImageBuffer(imageBuffer)
+
+features = @detector.featuresInImage(image)
+
+
+# This uses the detected features to add overlays
+# Its an exercise for the viewer :)
+add_face
+
+#...
+end
+              </code>
+            </pre>
+					</section>
+				</section>
+				
+				<!-- End of Face Detection -->
+
+				<section>
+					<section data-state="alert">
+						<h2>Face Recognition is Hard!</h2>
+						<p>
+							<strong>Currently Ruby does not have a decent linear algebra library. This is a problem!</strong>
+						</p>
+						<a href="#/7/1" class="image">
+							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png">
+						</a>
+					</section>
+					<section data-state="blackout">
+						<h2>*PLEA!*</h2>
+						<p>
+						  We need to work on this! Our arch-rival (python) has great bindings for LAPACK & BLAS, we can do this too!
+						</p>
+						<a href="#/7/2" class="image">
+							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png">
+						</a>
+					</section>
+					<section data-state="soothe">
+						<h2>Hope...</h2>
+						<p>
+						  There is a lineal algebra library that provides those bindings and has decent solvers. It has installation issues since its been out of date...but we can fix this :)
+						<a href="#/7/0" class="image">
+							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" style="-webkit-transform: rotate(180deg);">
+						</a>
+					</section>
+				</section>
+				
+				<!-- Example of nested vertical slides -->
+				<section>
+					<section>
+						<h2>Let's use Face.com</h2>
+						<p>
+						  We will use Face.com's face recognition API from the app
+						</p>
+						<a href="#/2/1" class="image">
+							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png">
+						</a>
+					</section>
+					<section>
+						<h2>Use Rubygems!</h2>
+						<p>
+						  Yes you have to use sudo as long as you installed MacRuby from the installer on the website. It won't mess rvm/rbenv up.
+						</p>  
+						<pre>
+						  <code class="bash" style="font-size:20px; margin-top: 20px;" contenteditable>
+sudo macgem install macruby-face
+              </code>
+              </pre>
+					</section>
+					
+					<section>
+  					<h2>Deployment Scheme in XCode</h2>
+  					<p>
+  						We need to tell XCode to compile our rubygem with our project in the XCode Deployment Scheme.
+  					</p>
+  					<img src="assets/deployment_scheme.png">
+  				</section>
+
+					<section>
+						<h2>Say Cheese!</h2>
+						<p>We will create an image connection and then asynchronously grab a still capture.</p>
+						<pre style="width:900px;">
+						  <code class="ruby" style="font-size:20px; margin-top: 20px;" contenteditable>
+def takePicture(sender)
+#...
+
+img_connection = @picture_output.connectionWithMediaType AVMediaTypeVideo
+
+@picture_output.captureStillImageAsynchronouslyFromConnection img_connection, completionHandler: call_back
+
+#...
+end
+                </code>
+              </pre>
+
+					</section>
+
+					<section>
+					<h2>Proc it!</h2>
+					<p>We'll use a good 'ol ruby Proc object to define the callback</p>
+					<pre style="width:800px;">
+					  <code class="ruby" style="font-size:20px; margin-top: 20px;" contenteditable>
+def takePicture(sender)
+#...
+
+call_back = Proc.new do |img_buffer, error|
+
+    image_data = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation img_buffer
+    
+    filename = "#{Dir.pwd}/test_pic.jpeg"
+    
+    image_data.writeToFile(filename, atomically:true)
+    
+    # You can also write to file the good ol' ruby way if you like :)
+    # File.open(filename, 'wb') {|f| f.write(image_data.to_str) }
+    
+    client = Face.get_client(:api_key => @face_key, :api_secret => @face_secret)
+    
+    resp = client.faces_recognize(:uids => ['all@aminharis7'], :file => File.new(filename, 'rb'), :detector => "normal")
+    
+    # Do some parsing on the response hash
+    # .. & set the value of our result
+    @recognized_label.stringValue =  "Nice Face #{pretty_uid} :)"
+    
+end
+
+#...
+end
+              </code>
+            </pre>
+					</section>
+				</section>
+
+				<!-- End of Face.com -->
+				
+				
+				<section data-state="soothe">
+					<h1>DEMO</h1>
+				</section>
+
+				<section>
+				  <h2>You WILL learn Cocoa & Obj-C!</h2>
+				  <p>...but that's OK!</p>
+				  
+				  <blockquote cite="http://searchservervirtualization.techtarget.com/definition/Our-Favorite-Technology-Quotations">
+						I love Ruby and I know that many others love Ruby. But let's not be monogamous. Share the love...be a polygamist!
+					</blockquote>
+					<p>
+            <i><small>- <a href="http://github.com/hamin">Haris Amin</a> / <a href="http://twitter.com/harisamin">@harisamin</a></small></i>
+          </p>
+				</section>
+				
+				<section>
+					<h1>THE END</h1>
+					<h3 class="inverted">BY Haris Amin / @harisamin</h3>
+					<h3 class="inverted">github: hamin</h3>
+					
+					<br/><br/>
+					<h4>Source for slides and code available on github.</h4>
+				</section>
+			</div>
+
+			<!-- The navigational controls UI -->
+			<aside class="controls">
+				<a class="left" href="#">&#x25C4;</a>
+				<a class="right" href="#">&#x25BA;</a>
+				<a class="up" href="#">&#x25B2;</a>
+				<a class="down" href="#">&#x25BC;</a>
+			</aside>
+
+			<!-- Displays presentation progress, max value changes via JS to reflect # of slides -->
+			<div class="progress"><span></span></div>
+			
+		</div>
+
+		<!-- Optional libraries for code syntax highlighting and classList support in IE9 -->
+		<script src="lib/highlight.js"></script>
+		<script src="lib/classList.js"></script>
+		
+		<script src="js/reveal.js"></script>
+		
+		<script>
+			// Parse the query string into a key/value object
+			var query = {};
+			location.search.replace( /[A-Z0-9]+?=(\w*)/gi, function(a) {
+				query[ a.split( '=' ).shift() ] = a.split( '=' ).pop();
+			} );
+
+			// Fires when a slide with data-state=customevent is activated
+			Reveal.addEventListener( 'customevent', function() {
+				alert( '"customevent" has fired' );
+			} );
+
+			// Fires each time a new slide is activated
+			Reveal.addEventListener( 'slidechanged', function( event ) {
+				// event.previousSlide, event.currentSlide, event.indexh, event.indexv
+			} );
+
+			Reveal.initialize({
+				// Display controls in the bottom right corner
+				controls: true,
+
+				// Display a presentation progress bar
+				progress: true,
+
+				// If true; each slide will be pushed to the browser history
+				history: true,
+
+				// Loops the presentation, defaults to false
+				loop: false,
+
+				// Flags if mouse wheel navigation should be enabled
+				mouseWheel: true,
+
+				// Apply a 3D roll to links on hover
+				rollingLinks: true,
+
+				// UI style
+				theme: query.theme || 'default', // default/neon
+
+				// Transition style
+				transition: query.transition || 'default' // default/cube/page/concave/linear(2d)
+			});
+
+			hljs.initHighlightingOnLoad();
+		</script>
+
+	</body>
+</html>
